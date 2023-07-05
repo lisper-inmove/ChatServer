@@ -1,0 +1,21 @@
+{
+  "id": "chatcmpl-7XL7AXqDv9tkU4EZTGVwx3OERT6MO",
+  "object": "chat.completion",
+  "created": 1688180344,
+  "model": "gpt-3.5-turbo-16k-0613",
+  "choices": [
+    {
+      "index": 0,
+      "message": {
+        "role": "assistant",
+        "content": "Here's an example of a Fibonacci function implemented in Rust:\n\n```rust\nfn fibonacci(n: u32) -> u32 {\n    if n <= 1 {\n        return n;\n    }\n\n    let mut fib = (0, 1);\n\n    for i in 2..=n {\n        fib = (fib.1, fib.0 + fib.1);\n    }\n\n    fib.1\n}\n\nfn main() {\n    let n = 10;\n\n    println!(\"Fibonacci({}) = {}\", n, fibonacci(n));\n}\n```\n\nIn this implementation, we have defined a function `fibonacci` that takes an unsigned 32-bit integer `n` as input and returns the nth Fibonacci number.\n\nIf `n` is less than or equal to 1, we simply return `n`. Otherwise, we initialize a tuple `fib` with the initial values `(0, 1)` representing the first two Fibonacci numbers.\n\nWe then use a `for` loop starting from 2 up to the given `n`. In each iteration, we update the tuple `fib` by assigning the current second value to the first position, and the sum of the previous two values to the second position.\n\nFinally, we return the second value of the tuple `fib`, which represents the nth Fibonacci number.\n\nIn the `main` function, we test the `fibonacci` function by passing the value 10 as input and printing the result."
+      },
+      "finish_reason": "stop"
+    }
+  ],
+  "usage": {
+    "prompt_tokens": 13,
+    "completion_tokens": 293,
+    "total_tokens": 306
+  }
+}

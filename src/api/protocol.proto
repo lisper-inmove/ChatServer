@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package api.protocol;
+
+
+message Request {
+  string sender = 1;
+  string content = 2;
+  string action = 3;
+}
+
+message Response {
+  string sender = 1;
+  string content = 2;
+  string action = 3;
+  bool is_start = 4;
+  bool is_finished = 5;
+  bool is_continue = 6;
+  bool is_complete = 7;
+}
