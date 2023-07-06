@@ -6,13 +6,26 @@ from dao.user_dao import UserDA
 class UserManager(BaseManager):
 
     @property
-    def da(self):
-        if self._da is None:
-            self._da = UserDA()
-        return self._da
+    def dao(self):
+        if self._dao is None:
+            self._dao = UserDA()
+        return self._dao
 
     def create_user(self, request):
         user = self.create_obj(user_pb.User)
+        user.username = request.username
+        user.password = request.password
+        return user
 
-    def sign_up(self, request):
-        pass
+    def add_user(self, user):
+        if not user:
+            return
+        self.update_obj(user)
+        self.dao.add_user(user)
+
+    async def get_user_by_username_password(self, username, password):
+        user = await self.dao.get_user_by_condition(
+            username=username,
+            password=password
+        )
+        return user

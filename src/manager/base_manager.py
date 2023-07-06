@@ -12,6 +12,7 @@ class BaseManager(Base):
             obj.createTime = IDate.now_timestamp()
         if hasattr(obj, 'updateTime'):
             obj.updateTime = IDate.now_timestamp()
+        return obj
 
     def update_obj(self, obj):
         if hasattr(obj, 'updateTime'):

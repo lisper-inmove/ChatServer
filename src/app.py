@@ -55,11 +55,13 @@ class HandlerHelper:
                 continue
             if _handler == BaseHandler:
                 continue
-            snake_name = self.pattern.sub(r'_\1', _handler.__name__).lower()
-            name = "_".join(snake_name.split("_")[:-1])
-            if name in self.handlers:
+            if not hasattr(_handler, 'PN'):
                 continue
-            self.handlers.update({name: _handler})
+            pn = getattr(_handler, 'PN')
+            for p in pn:
+                if p in self.handlers:
+                    continue
+                self.handlers.update({p: _handler})
             logger.info(f"导入handler: {_handler} {self.handlers}")
 
 

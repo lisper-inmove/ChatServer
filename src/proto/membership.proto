@@ -3,7 +3,7 @@ syntax = "proto3";
 package membership;
 
 message Membership {
-  string user_id = 1;
+  string userId = 1;
 }
 
 message RechargeConfig {

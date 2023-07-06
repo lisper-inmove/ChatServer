@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+# from pymongo import MongoClient
 from motor.motor_asyncio import AsyncIOMotorClient as MongoClient
 
 from submodules.utils.singleton import SingletonMetaThreadSafe as SingletonMetaclass
@@ -59,11 +60,11 @@ def update_one(self, matcher, json_obj, upsert=False):
     return self._coll.update_one(matcher, {"$set": json_obj}, upsert=upsert)
 
 
-def find_one(self, matcher, exclude=None):
+async def find_one(self, matcher, exclude=None):
     if exclude is not None:
-        obj = self._coll.find_one(matcher, exclude)
+        obj = await self._coll.find_one(matcher, exclude)
     else:
-        obj = self._coll.find_one(matcher)
+        obj = await self._coll.find_one(matcher)
     return obj
 
 

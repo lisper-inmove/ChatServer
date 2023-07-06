@@ -1,13 +1,27 @@
+import api.chitchat_pb2 as api_chitchat_pb
 import time
 import random
 import json
 from handlers.base_handler import BaseHandler
-import api.protocol_pb2 as protocol_pb
 
 
 class ChatHandler(BaseHandler):
 
-    def __call__(self, request):
+    # 创建消息,发聊天内容
+    CREATE_MESSAGE = 0x13
+    UPDATE_MESSAGE = 0x14
+    # 创建聊天
+    CREATE_CHAT = 0x10
+    UPDATE_CHAT = 0x11
+    DELETE_CHAT = 0x12
+    PN = [
+        CREATE_CHAT,
+        UPDATE_CHAT,
+        DELETE_CHAT,
+        CREATE_MESSAGE
+    ]
+
+    async def __call__(self, request):
         f = open("test")
         response = json.load(f)
         for chunk in response:
@@ -17,9 +31,7 @@ class ChatHandler(BaseHandler):
 
     def generate_response(self, chunk):
         choice = chunk.get('choices')[0]
-        response = protocol_pb.Response()
-        response.is_start = choice.get('delta').get('role') == 'assistant'
+        response = api_chitchat_pb.CreateMessageResponse()
+        response.role = choice.get('delta').get('role', '')
         response.content = choice.get('delta', {}).get('content', '')
-        response.is_finished = choice.get('finish_reason') == 'stop'
-        response.is_continue = not (response.is_start or response.is_finished)
         return response

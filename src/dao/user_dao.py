@@ -19,18 +19,19 @@ class UserDA(MongoDBHelper, BaseDao):
         user = self.find_one(matcher, user_pb.User)
         return user
 
-    def get_user_by_condition(self, **kargs):
-        user = self.__get_user_by_username_password(
+    async def get_user_by_condition(self, **kargs):
+        user = await self.__get_user_by_username_password(
             username=kargs.get("username"),
             password=kargs.get("password")
         )
+        return self.PH.to_obj(user, user_pb.User)
 
-    def __get_user_by_username_password(self, username, password):
+    async def __get_user_by_username_password(self, username, password):
         if None in (username, password):
             return None
-        matcer = {
+        matcher = {
             "username": username,
             "password": password
         }
-        user = self.find_one(matcher, user_pb.User)
+        user = await self.find_one(matcher)
         return user

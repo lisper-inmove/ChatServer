@@ -1,12 +1,12 @@
+import api.common_pb2 as api_common_pb
 from handlers.base_handler import BaseHandler
-import api.protocol_pb2 as protocol_pb
 
 
 class PingHandler(BaseHandler):
 
-    def __call__(self, request):
-        yield self.generate_response()
+    PING = 0x00
+    PN = [PING]
 
-    def generate_response(self):
-        response = protocol_pb.Response()
-        return response
+    async def __call__(self, request):
+        response = api_common_pb.PingResponse()
+        yield response
