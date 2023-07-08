@@ -1,5 +1,5 @@
-import api.user_pb2 as api_user_pb
-import proto.user_pb2 as user_pb
+import proto.api.api_user_pb2 as api_user_pb
+import proto.entities.user_pb2 as user_pb
 
 from handlers.base_handler import BaseHandler
 from manager.user_manager import UserManager

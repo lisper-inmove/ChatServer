@@ -1,4 +1,4 @@
-import proto.user_pb2 as user_pb
+import proto.entities.user_pb2 as user_pb
 from manager.base_manager import BaseManager
 from dao.user_dao import UserDA
 

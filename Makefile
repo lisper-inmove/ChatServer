@@ -1,5 +1,5 @@
 dev:
-	export PYTHONPATH=`pwd`/src:`pwd`/src/grpc_api && source bin/util.sh && python src/app.py
+	export PYTHONPATH=`pwd`/src:`pwd`/src/proto/grpc_api && source bin/util.sh && python src/app.py
 test-chat:
 	export PYTHONPATH=`pwd`/src && python src/tests/chat.py
 test-login:

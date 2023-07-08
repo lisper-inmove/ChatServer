@@ -1,4 +1,4 @@
-import proto.user_pb2 as user_pb
+import proto.entities.user_pb2 as user_pb
 from dao.mongodb import MongoDBHelper
 from dao.base_dao import BaseDao
 

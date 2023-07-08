@@ -1,4 +1,4 @@
-import api.chitchat_pb2 as api_chitchat_pb
+import proto.api.api_chitchat_pb2 as api_chitchat_pb
 import time
 import random
 import json
@@ -6,10 +6,8 @@ from handlers.base_handler import BaseHandler
 from errors import PopupError
 
 import grpc
-import grpc_api.chat_completion_pb2 as chat_completion_pb
-import grpc_api.chat_completion_pb2_grpc as chat_completion_pb_grpc
-
-import api.chitchat_pb2 as chitchat_pb
+import proto.grpc_api.grpc_chat_completion_pb2 as chat_completion_pb
+import proto.grpc_api.grpc_chat_completion_pb2_grpc as chat_completion_pb_grpc
 
 
 class ChatHandler(BaseHandler):
@@ -55,10 +53,10 @@ class ChatHandler(BaseHandler):
                 yield result
 
     async def create_chat(self, request):
-        request = self.HP.to_obj_v2(request, chitchat_pb.CreateChatRequest)
+        request = self.HP.to_obj_v2(request, api_chitchat_pb.CreateChatRequest)
 
     async def create_message(self, request):
-        request = self.PH.to_obj_v2(request, chitchat_pb.CreateMessageRequest)
+        request = self.PH.to_obj_v2(request, api_chitchat_pb.CreateMessageRequest)
         with grpc.insecure_channel('chat.inmove.top:50051') as channel:
             stub = chat_completion_pb_grpc.ChatCompletionStub(channel)
             for response in stub.Chat(chat_completion_pb.ChatRequest(

@@ -1,4 +1,4 @@
-import api.common_pb2 as api_common_pb
+import proto.api.api_common_pb2 as api_common_pb
 from handlers.base_handler import BaseHandler
 
 

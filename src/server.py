@@ -1,5 +1,5 @@
 import websockets
-import api.common_pb2 as common_pb
+import proto.api.api_common_pb2 as api_common_pb
 from submodules.utils.protobuf_helper import ProtobufHelper
 from submodules.utils.logger import Logger
 from errors import PopupError
@@ -49,6 +49,6 @@ class Server:
         return handler(action), content[2:]
 
     def generate_popup_error_response(self, error):
-        response = common_pb.PopupErrorResponse()
+        response = api_common_pb.PopupErrorResponse()
         response.error = error
         return response
