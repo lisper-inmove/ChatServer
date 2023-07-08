@@ -1,9 +1,7 @@
-import json
 import websockets
 import api.common_pb2 as common_pb
 from submodules.utils.protobuf_helper import ProtobufHelper
 from submodules.utils.logger import Logger
-from client import Client
 from errors import PopupError
 
 logger = Logger()
@@ -27,13 +25,15 @@ class Server:
 
     async def __handle_connection(self, websocket, path):
         async for message_json in websocket:
-            handler, message_json = self.parse_request(message_json)
             logger.info(f"收到信息: {message_json} {websocket}")
+            logger.info(f"收到信息: {message_json.encode()} {websocket}")
+            handler, message_json = self.parse_request(message_json)
             await self.handle_message(handler, websocket, message_json)
 
     async def handle_message(self, handler, client, params):
         try:
             async for response in handler(params):
+                logger.info(f"发送信息: {handler.PN_to_str().encode()} {response}")
                 await client.send(handler.PN_to_str() + ProtobufHelper.to_json_v2(response))
         except PopupError as err:
             logger.info(f"业务逻辑错误发生: {err}")

@@ -4,7 +4,6 @@ import os
 import re
 import inspect
 import asyncio
-import websockets
 import importlib.util
 from pathlib import Path
 

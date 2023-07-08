@@ -8,4 +8,4 @@ class BaseHandler(Base):
         self.cpn = pn
 
     def PN_to_str(self):
-        return int.to_bytes(2, self.cpn).decode()
+        return self.cpn.to_bytes(2).decode()

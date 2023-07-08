@@ -1,3 +1,6 @@
 [submodule "src/submodules/utils"]
 	path = src/submodules/utils
 	url = git@github.com:lisper-inmove/python-utils.git
+[submodule "src/grpc_api"]
+	path = src/grpc_api
+	url = git@github.com:lisper-inmove/chatGPTApiProto.git
