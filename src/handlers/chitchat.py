@@ -7,8 +7,8 @@ from manager.chitchat_manager import ChitchatManager
 from errors import PopupError
 
 import grpc
-import proto.grpc_api.grpc_chat_completion_pb2 as chat_completion_pb
-import proto.grpc_api.grpc_chat_completion_pb2_grpc as chat_completion_pb_grpc
+import proto.grpc_api.grpc_chatgpt_pb2 as grpc_chatgpt_pb
+import proto.grpc_api.grpc_chatgpt_pb2_grpc as grpc_chatgpt_pb_grpc
 
 
 class ChitchatHandler(BaseHandler):
@@ -53,10 +53,10 @@ class ChitchatHandler(BaseHandler):
     async def create_message(self, request):
         request = self.PH.to_obj_v2(request, api_chitchat_pb.CreateMessageRequest)
         with grpc.insecure_channel('chat.inmove.top:50051') as channel:
-            stub = chat_completion_pb_grpc.ChatCompletionStub(channel)
-            for response in stub.Chat(chat_completion_pb.ChatRequest(
+            stub = grpc_chatgpt_pb_grpc.ChatGPTStub(channel)
+            for response in stub.Chat(grpc_chatgpt_pb.ChatCompletionRequest(
                     messages=[
-                        chat_completion_pb.ChatMessage(
+                        grpc_chatgpt_pb.ChatCompletionRequest.ChatCompletionMessage(
                             role=request.role,
                             content=request.content
                         )

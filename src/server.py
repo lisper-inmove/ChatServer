@@ -19,7 +19,6 @@ class Server:
 
     async def handle_connection(self, websocket, path):
         try:
-            print(f"!!!!!!!!!!!!!!!!!!!: {websocket}")
             setattr(websocket, "session", Session())
             await self.__handle_connection(websocket, path)
         except websockets.ConnectionClosed as ex:
@@ -40,8 +39,7 @@ class Server:
                             BaseHandler.LOGIN,
                             BaseHandler.SIGN_UP
                     ]:
-                        await self.handle_message(handler, websocket, message_json)
-                        websocket.session.isAuthorized = True
+                        await self.handle_user_authorize(handler, websocket, message_json)
             except PopupError as err:
                 logger.traceback(err, f"业务逻辑错误: {err}")
                 response = self.generate_popup_error_response(str(err))
@@ -50,8 +48,17 @@ class Server:
     async def handle_message(self, handler, websocket, params):
         async for response in handler(params):
             # 如果登陆或者注册失败了会直接抛出错误,所以如果代码执行到此处一定是成功的
-            # await websocket.send(self.PN_to_bytes(handler.cpn) + response.SerializeToString())
-            await websocket.send(ProtobufHelper.to_json_v2(self.wrap_protocol(response, handler.cpn)))
+            await websocket.send(ProtobufHelper.to_json_v2(
+                self.wrap_protocol(response, handler.cpn)))
+
+    async def handle_user_authorize(self, handler, websocket, params):
+        async for response in handler(params):
+            response = await self.handle_message(handler, websocket, params)
+            websocket.session.user = handler.user
+            websocket.session.isAuthorized = True
+            websocket.session.token = response.token
+            await websocket.send(ProtobufHelper.to_json_v2(
+                self.wrap_protocol(response, handler.cpn)))
 
     def wrap_protocol(self, response, action, errmsg=None):
         p = api_common_pb.Protocol()
@@ -75,6 +82,3 @@ class Server:
         response = api_common_pb.PopupErrorResponse()
         response.error = error
         return self.wrap_protocol(response, BaseHandler.POPUP_ERROR, error)
-
-    def PN_to_bytes(self, pn):
-        return struct.pack('H', pn)

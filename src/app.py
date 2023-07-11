@@ -1,5 +1,3 @@
-from chat3 import Chat
-
 import os
 import re
 import inspect

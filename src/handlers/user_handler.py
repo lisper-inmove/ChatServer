@@ -33,6 +33,7 @@ class UserHandler(BaseHandler):
         )
         if not user:
             raise PopupError("用户不存在")
+        self.user = user
         yield self.generate_response(user)
 
     async def sign_up(self, request):
@@ -44,6 +45,7 @@ class UserHandler(BaseHandler):
         user.username = user_request.username
         user.password = user_request.password
         await manager.add_user(user)
+        self.user = user
         yield self.generate_response(user)
 
     def generate_response(self, user):
