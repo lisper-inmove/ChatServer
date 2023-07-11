@@ -12,6 +12,10 @@
 #+begin_verse
 用Typescript实现的前端页面
 #+end_verse
+#+begin_src shell
+  python -m pip install grpcio
+  python -m pip install grpcio-tools
+#+end_src
 * ChatApiProtobuf
 #+begin_verse
 用于保存protobuf相关的文件,包括api,grpc以及实体对象

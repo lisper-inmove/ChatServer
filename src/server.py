@@ -27,36 +27,37 @@ class Server:
     async def __handle_connection(self, websocket, path):
         async for message_json in websocket:
             try:
-                logger.info(f"收到信息: {message_json} {websocket}")
-                logger.info(f"收到信息: {message_json.encode()} {websocket}")
-                handler, message_json = self.parse_request(message_json)
-                if handler.cpn == BaseHandler.PING:
-                    await self.handle_message(handler, websocket, message_json)
+                message = api_common_pb.Protocol()
+                message.ParseFromString(message_json)
+                logger.info(f"收到信息: {message} {websocket}")
+                handler = self.handlers.get(message.action)(message.action)
+                if message.action == BaseHandler.PING:
+                    await self.handle_message(handler, websocket, message)
                 else:
                     if websocket.session.isAuthorized:
-                        await self.handle_message(handler, websocket, message_json)
-                    elif handler.cpn in [
+                        await self.handle_message(handler, websocket, message)
+                    elif message.action in [
                             BaseHandler.LOGIN,
                             BaseHandler.SIGN_UP
                     ]:
-                        await self.handle_user_authorize(handler, websocket, message_json)
+                        await self.handle_user_authorize(handler, websocket, message)
             except PopupError as err:
                 logger.traceback(err, f"业务逻辑错误: {err}")
                 response = self.generate_popup_error_response(str(err))
                 await websocket.send(ProtobufHelper.to_json_v2(response))
 
-    async def handle_message(self, handler, websocket, params):
-        async for response in handler(params):
+    async def handle_message(self, handler, websocket, message):
+        async for response in handler(message.content):
             # 如果登陆或者注册失败了会直接抛出错误,所以如果代码执行到此处一定是成功的
             await websocket.send(ProtobufHelper.to_json_v2(
                 self.wrap_protocol(response, handler.cpn)))
 
-    async def handle_user_authorize(self, handler, websocket, params):
-        async for response in handler(params):
-            response = await self.handle_message(handler, websocket, params)
+    async def handle_user_authorize(self, handler, websocket, message):
+        async for response in handler(message.content):
             websocket.session.user = handler.user
             websocket.session.isAuthorized = True
             websocket.session.token = response.token
+            logger.info(f"回复消息: {response}")
             await websocket.send(ProtobufHelper.to_json_v2(
                 self.wrap_protocol(response, handler.cpn)))
 
@@ -69,14 +70,6 @@ class Server:
         else:
             p.errmsg = "success"
         return p
-
-    def parse_request(self, content):
-        """收到的字符串前两个字节表示请求的action"""
-        action = int.from_bytes(content[0:2].encode())
-        handler = self.handlers.get(action)
-        if handler is None:
-            raise PopupError(f"Action Not Supported: {action}")
-        return handler(action), content[2:]
 
     def generate_popup_error_response(self, error):
         response = api_common_pb.PopupErrorResponse()
