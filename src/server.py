@@ -44,13 +44,13 @@ class Server:
             except PopupError as err:
                 logger.traceback(err, f"业务逻辑错误: {err}")
                 response = self.generate_popup_error_response(str(err))
-                await websocket.send(ProtobufHelper.to_json_v2(response))
+                # await websocket.send(ProtobufHelper.to_json_v2(response))
+                await websocket.send(response.SerializeToString())
 
     async def handle_message(self, handler, websocket, message):
         async for response in handler(message.content):
             # 如果登陆或者注册失败了会直接抛出错误,所以如果代码执行到此处一定是成功的
-            await websocket.send(ProtobufHelper.to_json_v2(
-                self.wrap_protocol(response, handler.cpn)))
+            await websocket.send(self.wrap_protocol(response, handler.cpn).SerializeToString())
 
     async def handle_user_authorize(self, handler, websocket, message):
         async for response in handler(message.content):
@@ -58,8 +58,8 @@ class Server:
             websocket.session.isAuthorized = True
             websocket.session.token = response.token
             logger.info(f"回复消息: {response}")
-            await websocket.send(ProtobufHelper.to_json_v2(
-                self.wrap_protocol(response, handler.cpn)))
+            print(self.wrap_protocol(response, handler.cpn).SerializeToString())
+            await websocket.send(self.wrap_protocol(response, handler.cpn).SerializeToString())
 
     def wrap_protocol(self, response, action, errmsg=None):
         p = api_common_pb.Protocol()
