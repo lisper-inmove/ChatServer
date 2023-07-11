@@ -3,6 +3,7 @@ import time
 import random
 import json
 from handlers.base_handler import BaseHandler
+from manager.chitchat_manager import ChitchatManager
 from errors import PopupError
 
 import grpc
@@ -10,23 +11,14 @@ import proto.grpc_api.grpc_chat_completion_pb2 as chat_completion_pb
 import proto.grpc_api.grpc_chat_completion_pb2_grpc as chat_completion_pb_grpc
 
 
-class ChatHandler(BaseHandler):
+class ChitchatHandler(BaseHandler):
 
-    # 创建消息,发聊天内容
-    CREATE_MESSAGE = 0x13
-    UPDATE_MESSAGE = 0x14
-    LIST_MESSAGE = 0x15
-    # 创建聊天
-    CREATE_CHAT = 0x10
-    UPDATE_CHAT = 0x11
-    DELETE_CHAT = 0x12
-    LIST_CHAT = 0x16
     PN = [
-        CREATE_CHAT,
-        UPDATE_CHAT,
-        DELETE_CHAT,
-        CREATE_MESSAGE,
-        UPDATE_MESSAGE,
+        BaseHandler.CREATE_CHAT,
+        BaseHandler.UPDATE_CHAT,
+        BaseHandler.DELETE_CHAT,
+        BaseHandler.CREATE_MESSAGE,
+        BaseHandler.UPDATE_MESSAGE,
     ]
 
     async def __call__(self, request):
@@ -40,20 +32,23 @@ class ChatHandler(BaseHandler):
             async for result in self.list_message(request):
                 yield result
         elif self.cpn == self.CREATE_CHAT:
-            async for result in self.create_chat(request):
+            async for result in self.create_chitchat(request):
                 yield result
         elif self.cpn == self.UPDATE_CHAT:
-            async for result in self.update_chat(request):
+            async for result in self.update_chitchat(request):
                 yield result
         elif self.cpn == self.DELETE_CHAT:
-            async for result in self.delete_chat(request):
+            async for result in self.delete_chitchat(request):
                 yield result
         elif self.cpn == self.LIST_CHAT:
-            async for result in self.list_chat(request):
+            async for result in self.list_chitchat(request):
                 yield result
 
-    async def create_chat(self, request):
-        request = self.HP.to_obj_v2(request, api_chitchat_pb.CreateChatRequest)
+    async def create_chitchat(self, request):
+        manager = ChitchatManager()
+        request = self.HP.to_obj_v2(request, api_chitchat_pb.CreateChitchatRequest)
+        chitchat = manager.create_chitchat(request, user)
+        yield chitchat
 
     async def create_message(self, request):
         request = self.PH.to_obj_v2(request, api_chitchat_pb.CreateMessageRequest)

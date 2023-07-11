@@ -17,11 +17,11 @@ class UserManager(BaseManager):
         user.password = request.password
         return user
 
-    def add_user(self, user):
+    async def add_user(self, user):
         if not user:
             return
         self.update_obj(user)
-        self.dao.add_user(user)
+        await self.dao.add_user(user)
 
     async def get_user_by_username_password(self, username, password):
         user = await self.dao.get_user_by_condition(

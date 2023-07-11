@@ -9,9 +9,10 @@ from submodules.utils.jwt_util import JWTUtil
 
 class UserHandler(BaseHandler):
 
-    LOGIN = 0x01
-    SIGN_UP = 0x02
-    PN = [LOGIN, SIGN_UP]
+    PN = [
+        BaseHandler.LOGIN,
+        BaseHandler.SIGN_UP
+    ]
 
     async def __call__(self, request):
         if self.cpn == self.LOGIN:
@@ -42,7 +43,7 @@ class UserHandler(BaseHandler):
         user = manager.create_user(user_request)
         user.username = user_request.username
         user.password = user_request.password
-        manager.add_user(user)
+        await manager.add_user(user)
         yield self.generate_response(user)
 
     def generate_response(self, user):

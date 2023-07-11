@@ -1,22 +1,33 @@
+from pymongo.errors import DuplicateKeyError
+
 import proto.entities.user_pb2 as user_pb
 from dao.mongodb import MongoDBHelper
 from dao.base_dao import BaseDao
+from errors import PopupError
+from submodules.utils.logger import Logger
+
+logger = Logger()
 
 
 class UserDA(MongoDBHelper, BaseDao):
 
     coll = "___user_db___users___"
 
-    def add_user(self, user):
+    async def add_user(self, user):
         matcher = {
             'id': user.id
         }
         json_data = self.PH.to_dict(user)
-        self.update_one(matcher, json_data, upsert=True)
+        try:
+            await self.update_one(matcher, json_data, upsert=True)
+        except DuplicateKeyError as err:
+            logger.error(str(err))
+            if "".join(err.details.get("keyValue").keys()) == 'username':
+                raise PopupError("用户名已存在")
 
-    def get_user_by_id(self, id):
+    async def get_user_by_id(self, id):
         matcher = {'id': id}
-        user = self.find_one(matcher, user_pb.User)
+        user = await self.find_one(matcher, user_pb.User)
         return user
 
     async def get_user_by_condition(self, **kargs):
