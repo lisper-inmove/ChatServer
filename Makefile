@@ -1,3 +1,5 @@
+install-lib:
+	pip install -r requirement.txt
 dev:
 	export PYTHONPATH=`pwd`/src:`pwd`/src/proto/grpc_api && source bin/util.sh && python src/app.py
 test-chat:
