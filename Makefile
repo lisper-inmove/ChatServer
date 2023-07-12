@@ -10,3 +10,5 @@ api-python:
 	cd src/proto && make api-python
 grpc-python:
 	cd src/proto && make grpc-python
+entity:
+	cd src/proto && make entity
