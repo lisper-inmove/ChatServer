@@ -43,14 +43,15 @@ class Server:
                         await self.handle_user_authorize(handler, websocket, message)
             except PopupError as err:
                 logger.traceback(err, f"业务逻辑错误: {err}")
-                response = self.generate_popup_error_response(str(err))
-                # await websocket.send(ProtobufHelper.to_json_v2(response))
-                await websocket.send(response.SerializeToString())
+                replay = self.wrap_protocol(None, handler.cpn).SerializeToString()
+                await websocket.send(replay)
 
     async def handle_message(self, handler, websocket, message):
         async for response in handler(message.content):
             # 如果登陆或者注册失败了会直接抛出错误,所以如果代码执行到此处一定是成功的
-            await websocket.send(self.wrap_protocol(response, handler.cpn).SerializeToString())
+            logger.info(f"回复消息: {handler} {response}")
+            replay = self.wrap_protocol(response, handler.cpn).SerializeToString()
+            await websocket.send(replay)
 
     async def handle_user_authorize(self, handler, websocket, message):
         async for response in handler(message.content):
@@ -58,20 +59,16 @@ class Server:
             websocket.session.isAuthorized = True
             websocket.session.token = response.token
             logger.info(f"回复消息: {response}")
-            print(self.wrap_protocol(response, handler.cpn).SerializeToString())
-            await websocket.send(self.wrap_protocol(response, handler.cpn).SerializeToString())
+            replay = self.wrap_protocol(response, handler.cpn).SerializeToString()
+            await websocket.send(replay)
 
     def wrap_protocol(self, response, action, errmsg=None):
         p = api_common_pb.Protocol()
         p.action = action
-        p.content = ProtobufHelper.to_json_v2(response)
+        if response is not None:
+            p.content = ProtobufHelper.to_json_v2(response)
         if errmsg:
             p.errmsg = errmsg
         else:
             p.errmsg = "success"
         return p
-
-    def generate_popup_error_response(self, error):
-        response = api_common_pb.PopupErrorResponse()
-        response.error = error
-        return self.wrap_protocol(response, BaseHandler.POPUP_ERROR, error)
