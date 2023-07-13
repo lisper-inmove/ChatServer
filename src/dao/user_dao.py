@@ -27,8 +27,8 @@ class UserDA(MongoDBHelper, BaseDao):
 
     async def get_user_by_id(self, id):
         matcher = {'id': id}
-        user = await self.find_one(matcher, user_pb.User)
-        return user
+        user = await self.find_one(matcher)
+        return self.PH.to_obj(user, user_pb.User)
 
     async def get_user_by_condition(self, **kargs):
         user = await self.__get_user_by_username_password(

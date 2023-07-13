@@ -1,4 +1,5 @@
 import proto.api.api_chitchat_pb2 as api_chitchat_pb
+import proto.api.api_common_pb2 as api_common_pb
 import time
 import random
 import json
@@ -14,33 +15,33 @@ import proto.grpc_api.grpc_chatgpt_pb2_grpc as grpc_chatgpt_pb_grpc
 class ChitchatHandler(BaseHandler):
 
     PN = [
-        BaseHandler.CREATE_CHAT,
-        BaseHandler.UPDATE_CHAT,
-        BaseHandler.DELETE_CHAT,
-        BaseHandler.CREATE_MESSAGE,
-        BaseHandler.UPDATE_MESSAGE,
+        api_common_pb.ProtocolNumber.CREATE_CHITCHAT,
+        api_common_pb.ProtocolNumber.UPDATE_CHITCHAT,
+        api_common_pb.ProtocolNumber.DELETE_CHITCHAT,
+        api_common_pb.ProtocolNumber.CREATE_MESSAGE,
+        api_common_pb.ProtocolNumber.UPDATE_MESSAGE,
     ]
 
     async def __call__(self, request):
-        if self.cpn == self.CREATE_MESSAGE:
+        if self.cpn == api_common_pb.ProtocolNumber.CREATE_MESSAGE:
             async for result in self.create_message(request):
                 yield result
-        elif self.cpn == self.UPDATE_MESSAGE:
+        elif self.cpn == api_common_pb.ProtocolNumber.UPDATE_MESSAGE:
             async for result in self.update_message(request):
                 yield result
-        elif self.cpn == self.LIST_MESSAGE:
+        elif self.cpn == api_common_pb.ProtocolNumber.LIST_MESSAGE:
             async for result in self.list_message(request):
                 yield result
-        elif self.cpn == self.CREATE_CHAT:
+        elif self.cpn == api_common_pb.ProtocolNumber.CREATE_CHITCHAT:
             async for result in self.create_chitchat(request):
                 yield result
-        elif self.cpn == self.UPDATE_CHAT:
+        elif self.cpn == api_common_pb.ProtocolNumber.UPDATE_CHITCHAT:
             async for result in self.update_chitchat(request):
                 yield result
-        elif self.cpn == self.DELETE_CHAT:
+        elif self.cpn == api_common_pb.ProtocolNumber.DELETE_CHITCHAT:
             async for result in self.delete_chitchat(request):
                 yield result
-        elif self.cpn == self.LIST_CHAT:
+        elif self.cpn == api_common_pb.ProtocolNumber.LIST_CHITCHAT:
             async for result in self.list_chitchat(request):
                 yield result
 
@@ -52,9 +53,9 @@ class ChitchatHandler(BaseHandler):
 
     async def create_message(self, request):
         request = self.PH.to_obj_v2(request, api_chitchat_pb.CreateMessageRequest)
-        with grpc.insecure_channel('chat.inmove.top:50051') as channel:
+        with grpc.secure_channel('chat.inmove.top:8443', grpc.ssl_channel_credentials()) as channel:
             stub = grpc_chatgpt_pb_grpc.ChatGPTStub(channel)
-            for response in stub.Chat(grpc_chatgpt_pb.ChatCompletionRequest(
+            for response in stub.ChatCompletion(grpc_chatgpt_pb.ChatCompletionRequest(
                     messages=[
                         grpc_chatgpt_pb.ChatCompletionRequest.ChatCompletionMessage(
                             role=request.role,

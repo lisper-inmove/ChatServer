@@ -123,7 +123,6 @@ ujson==5.7.0
 unicorn==2.0.1.post1
 urllib3==1.26.15
 uvicorn==0.22.0
-uWSGI @ file:///croot/uwsgi_1679988297904/work
 wcwidth==0.2.6
 websockets==11.0.3
 Werkzeug==2.3.4

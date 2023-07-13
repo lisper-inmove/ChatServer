@@ -29,3 +29,7 @@ class UserManager(BaseManager):
             password=password
         )
         return user
+
+    async def get_user_by_id(self, id):
+        user = await self.dao.get_user_by_id(id=id)
+        return user

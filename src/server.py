@@ -5,7 +5,6 @@ import proto.api.api_common_pb2 as api_common_pb
 from submodules.utils.protobuf_helper import ProtobufHelper
 from submodules.utils.logger import Logger
 from errors import PopupError
-from handlers.base_handler import BaseHandler
 from session import Session
 
 logger = Logger()
@@ -31,14 +30,15 @@ class Server:
                 message.ParseFromString(message_json)
                 logger.info(f"收到信息: {message} {websocket}")
                 handler = self.handlers.get(message.action)(message.action)
-                if message.action == BaseHandler.PING:
+                if message.action == api_common_pb.ProtocolNumber.PING:
                     await self.handle_message(handler, websocket, message)
                 else:
                     if websocket.session.isAuthorized:
                         await self.handle_message(handler, websocket, message)
                     elif message.action in [
-                            BaseHandler.LOGIN,
-                            BaseHandler.SIGN_UP
+                            api_common_pb.ProtocolNumber.LOGIN,
+                            api_common_pb.ProtocolNumber.SIGN_UP,
+                            api_common_pb.ProtocolNumber.TOKEN_AUTHORIZE
                     ]:
                         await self.handle_user_authorize(handler, websocket, message)
             except PopupError as err:
