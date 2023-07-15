@@ -16,6 +16,7 @@ class ChitchatManager(BaseManager):
         chitchat.userId = user.id
         chitchat.name = request.name
         chitchat.type = chitchat_pb.Chitchat.Type.Value(request.type)
+        chitchat.description = request.description
         return chitchat
 
     async def list_chitchat(self, user):
