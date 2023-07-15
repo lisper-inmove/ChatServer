@@ -5,6 +5,7 @@ import random
 import json
 from handlers.base_handler import BaseHandler
 from manager.chitchat_manager import ChitchatManager
+from manager.chitchat_message_manager import ChitchatMessageManager
 from errors import PopupError
 
 import grpc
@@ -69,7 +70,10 @@ class ChitchatHandler(BaseHandler):
             yield chitchat
 
     async def create_message(self, request):
+        manager = ChitchatMessageManager()
         request = self.PH.to_obj_v2(request, api_chitchat_pb.CreateMessageRequest)
+        chitchatMessage = manager.create_chitchat_message(request)
+        chitchatResponseMessage = manager.create_chitchat_response_message(request)
         with grpc.secure_channel('chat.inmove.top:8443', grpc.ssl_channel_credentials()) as channel:
             stub = grpc_chatgpt_pb_grpc.ChatGPTStub(channel)
             for response in stub.ChatCompletion(grpc_chatgpt_pb.ChatCompletionRequest(
@@ -80,7 +84,11 @@ class ChitchatHandler(BaseHandler):
                         )
                     ]
             )):
-                yield self.generate_response(response)
+                response = self.generate_response(response)
+                chitchatResponseMessage.content += response.content
+                yield response
+        await manager.add_or_update_chitchat_message(chitchatMessage)
+        await manager.add_or_update_chitchat_message(chitchatResponseMessage)
 
     def generate_response(self, chunk):
         choice = chunk.choices[0]
