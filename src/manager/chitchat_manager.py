@@ -22,6 +22,13 @@ class ChitchatManager(BaseManager):
         async for chitchat in self.dao.list_chitchat(user.id):
             yield chitchat
 
+    async def get_chitchat_by_id(self, id):
+        chitchat = await self.dao.get_chitchat_by_id(id)
+        return self.PH.to_obj(chitchat, chitchat_pb.Chitchat)
+
+    async def delete_chitchat(self, chitchat):
+        return await self.dao.delete_chitchat(chitchat.id)
+
     async def add_or_update_chitchat(self, chitchat):
         super().update_obj(chitchat)
         await self.dao.add_or_update_chitchat(chitchat)

@@ -73,8 +73,8 @@ def count(self, matcher):
     return count
 
 
-def delete_one(self, matcher):
-    return self._coll.delete_one(matcher)
+async def delete_one(self, matcher):
+    return await self._coll.delete_one(matcher)
 
 
 @FuncTimeExpend(prefix="批量查找>>>>>: ")

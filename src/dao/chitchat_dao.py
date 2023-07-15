@@ -17,6 +17,9 @@ class ChitchatDA(MongoDBHelper, BaseDao):
     async def get_chitchat_by_id(self, id):
         return await self.find_one({"id": id})
 
-    async def list_chitchat(self, user_id):
-        async for chitchat in self.find_many(matcher={"userId": user_id}):
+    async def delete_chitchat(self, id):
+        return await self.delete_one({"id": id})
+
+    async def list_chitchat(self, userId):
+        async for chitchat in self.find_many(matcher={"userId": userId}):
             yield self.PH.to_obj(chitchat, chitchat_pb.Chitchat)

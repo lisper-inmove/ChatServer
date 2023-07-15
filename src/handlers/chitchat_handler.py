@@ -45,6 +45,17 @@ class ChitchatHandler(BaseHandler):
             async for result in self.list_chitchat(request):
                 yield result
 
+    async def delete_chitchat(self, request):
+        manager = ChitchatManager()
+        request = self.PH.to_obj_v2(request, api_chitchat_pb.DeleteChitchatRequest)
+        chitchat = await manager.get_chitchat_by_id(request.id)
+        if not chitchat:
+            raise PopupError("Chitchat not Exists")
+        if chitchat.userId != self.user.id:
+            raise PopupError("Can not delete other's Chitchat")
+        await manager.delete_chitchat(chitchat)
+        yield chitchat
+
     async def create_chitchat(self, request):
         manager = ChitchatManager()
         request = self.PH.to_obj_v2(request, api_chitchat_pb.CreateChitchatRequest)
