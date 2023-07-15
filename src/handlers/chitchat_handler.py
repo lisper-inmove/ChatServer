@@ -47,9 +47,15 @@ class ChitchatHandler(BaseHandler):
 
     async def create_chitchat(self, request):
         manager = ChitchatManager()
-        request = self.HP.to_obj_v2(request, api_chitchat_pb.CreateChitchatRequest)
-        chitchat = manager.create_chitchat(request, user)
+        request = self.PH.to_obj_v2(request, api_chitchat_pb.CreateChitchatRequest)
+        chitchat = manager.create_chitchat(request, self.user)
+        await manager.add_or_update_chitchat(chitchat)
         yield chitchat
+
+    async def list_chitchat(self, request):
+        manager = ChitchatManager()
+        async for chitchat in manager.list_chitchat(self. user):
+            yield chitchat
 
     async def create_message(self, request):
         request = self.PH.to_obj_v2(request, api_chitchat_pb.CreateMessageRequest)

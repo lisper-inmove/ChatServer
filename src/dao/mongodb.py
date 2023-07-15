@@ -90,7 +90,8 @@ async def find_many(self, matcher, sortby=None, page=None, size=None, enable_emp
     size = int(size)
     skip = (page - 1) * size
     logger.info(f">>>> find_many: {matcher} -> sortby: {sortby}, skip: {skip}")
-    return await self._coll.find(matcher).sort(sortby).skip(skip).limit(size)
+    async for result in self._coll.find(matcher).sort(sortby).skip(skip).limit(size):
+        yield result
 
 
 def pkg_matcher(self, matcher):

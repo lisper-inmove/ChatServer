@@ -1,5 +1,3 @@
-import struct
-
 import websockets
 import proto.api.api_common_pb2 as api_common_pb
 from submodules.utils.protobuf_helper import ProtobufHelper
@@ -29,7 +27,10 @@ class Server:
                 message = api_common_pb.Protocol()
                 message.ParseFromString(message_json)
                 logger.info(f"收到信息: {message} {websocket}")
-                handler = self.handlers.get(message.action)(message.action)
+                handler = self.handlers.get(message.action)(
+                    message.action,
+                    user=websocket.session.user
+                )
                 if message.action == api_common_pb.ProtocolNumber.PING:
                     await self.handle_message(handler, websocket, message)
                 else:
@@ -61,6 +62,19 @@ class Server:
             logger.info(f"回复消息: {response}")
             replay = self.wrap_protocol(response, handler.cpn).SerializeToString()
             await websocket.send(replay)
+            await self.send_init_info(websocket)
+
+    async def send_init_info(self, websocket):
+        """当用户授权之后,给用户发一些必须要信息."""
+        await self.__send_chitchat_list(websocket)
+
+    async def __send_chitchat_list(self, websocket):
+        from handlers.chitchat_handler import ChitchatHandler
+        handler = ChitchatHandler(api_common_pb.ProtocolNumber.LIST_CHITCHAT)
+        handler.user = websocket.session.user
+        async for response in handler(None):
+            reply = self.wrap_protocol(response, handler.cpn).SerializeToString()
+            await websocket.send(reply)
 
     def wrap_protocol(self, response, action, errmsg=None):
         p = api_common_pb.Protocol()
