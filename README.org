@@ -24,7 +24,8 @@
 用Typescript实现的前端页面
 1. npm i
 2. make api-typescript
-3. npm run dev
+3. make entity-typescript
+4. npm run dev
 #+end_verse
 * ChatApiProtobuf
 [[https://github.com/lisper-inmove/ChatApiProtobuf][ChatApiProtobuf]]

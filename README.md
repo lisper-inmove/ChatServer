@@ -1,14 +1,14 @@
 
 # Table of Contents
 
-1.  [ChatServer](#org894c754)
-2.  [ChatGPTClient](#org76e2fdc)
-3.  [ChatClient](#orgfc6313e)
-4.  [ChatApiProtobuf](#org7922899)
+1.  [ChatServer](#orgff4cab2)
+2.  [ChatGPTClient](#org3a5615c)
+3.  [ChatClient](#org3555467)
+4.  [ChatApiProtobuf](#orgfddb6f8)
 
 
 
-<a id="org894c754"></a>
+<a id="orgff4cab2"></a>
 
 # ChatServer
 
@@ -24,7 +24,7 @@
 </p>
 
 
-<a id="org76e2fdc"></a>
+<a id="org3a5615c"></a>
 
 # ChatGPTClient
 
@@ -38,7 +38,7 @@
 </p>
 
 
-<a id="orgfc6313e"></a>
+<a id="org3555467"></a>
 
 # ChatClient
 
@@ -48,11 +48,12 @@
 用Typescript实现的前端页面<br />
 1. npm i<br />
 2. make api-typescript<br />
-3. npm run dev<br />
+3. make entity-typescript<br />
+4. npm run dev<br />
 </p>
 
 
-<a id="org7922899"></a>
+<a id="orgfddb6f8"></a>
 
 # ChatApiProtobuf
 
