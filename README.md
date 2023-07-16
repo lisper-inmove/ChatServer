@@ -1,14 +1,14 @@
 
 # Table of Contents
 
-1.  [ChatServer](#orgff4cab2)
-2.  [ChatGPTClient](#org3a5615c)
-3.  [ChatClient](#org3555467)
-4.  [ChatApiProtobuf](#orgfddb6f8)
+1.  [ChatServer](#org72a9dd2)
+2.  [ChatGPTClient](#orge6b0418)
+3.  [ChatClient](#orgeb8f612)
+4.  [ChatApiProtobuf](#org4752834)
 
 
 
-<a id="orgff4cab2"></a>
+<a id="org72a9dd2"></a>
 
 # ChatServer
 
@@ -17,14 +17,14 @@
 <p class="verse">
 服务端使用Python实现的Websocket,给ChatClient提供服务以及调用ChatGPTClient的接口<br />
 1. make install-lib: 安装依赖库<br />
-2. make api-python: 编译proto/api下的proto<br />
-3. make grpc-python: 编译proto/grpc\_api下的proto<br />
+2. make api: 编译proto/api下的proto<br />
+3. make grpc: 编译proto/grpc\_api下的proto<br />
 4. make entity: 编译proto/entities下的proto<br />
 5. make dev: 开发模式运行<br />
 </p>
 
 
-<a id="org3a5615c"></a>
+<a id="orge6b0418"></a>
 
 # ChatGPTClient
 
@@ -33,12 +33,12 @@
 <p class="verse">
 一个gRPC的服务,用于对接chatgpt的api<br />
 1. make install-lib<br />
-2. make grpc-python<br />
+2. make grpc<br />
 3. make dev<br />
 </p>
 
 
-<a id="org3555467"></a>
+<a id="orgeb8f612"></a>
 
 # ChatClient
 
@@ -47,13 +47,13 @@
 <p class="verse">
 用Typescript实现的前端页面<br />
 1. npm i<br />
-2. make api-typescript<br />
-3. make entity-typescript<br />
+2. make api<br />
+3. make entity<br />
 4. npm run dev<br />
 </p>
 
 
-<a id="orgfddb6f8"></a>
+<a id="org4752834"></a>
 
 # ChatApiProtobuf
 

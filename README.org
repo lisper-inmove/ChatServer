@@ -5,8 +5,8 @@
 #+begin_verse
 服务端使用Python实现的Websocket,给ChatClient提供服务以及调用ChatGPTClient的接口
 1. make install-lib: 安装依赖库
-2. make api-python: 编译proto/api下的proto
-3. make grpc-python: 编译proto/grpc_api下的proto
+2. make api: 编译proto/api下的proto
+3. make grpc: 编译proto/grpc_api下的proto
 4. make entity: 编译proto/entities下的proto
 5. make dev: 开发模式运行
 #+end_verse
@@ -15,7 +15,7 @@
 #+begin_verse
 一个gRPC的服务,用于对接chatgpt的api
 1. make install-lib
-2. make grpc-python
+2. make grpc
 3. make dev
 #+end_verse
 * ChatClient
@@ -23,8 +23,8 @@
 #+begin_verse
 用Typescript实现的前端页面
 1. npm i
-2. make api-typescript
-3. make entity-typescript
+2. make api
+3. make entity
 4. npm run dev
 #+end_verse
 * ChatApiProtobuf
