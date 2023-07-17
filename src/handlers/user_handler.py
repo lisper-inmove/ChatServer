@@ -18,15 +18,16 @@ class UserHandler(BaseHandler):
     ]
 
     async def __call__(self, request):
-        if self.cpn == api_common_pb.ProtocolNumber.LOGIN:
-            async for result in self.login(request):
-                yield result
-        elif self.cpn == api_common_pb.ProtocolNumber.SIGN_UP:
-            async for result in self.sign_up(request):
-                yield result
-        elif self.cpn == api_common_pb.ProtocolNumber.TOKEN_AUTHORIZE:
-            async for result in self.token_authorize(request):
-                yield result
+        fmaps = {
+            api_common_pb.ProtocolNumber.LOGIN: self.login,
+            api_common_pb.ProtocolNumber.SIGN_UP: self.sign_up,
+            api_common_pb.ProtocolNumber.TOKEN_AUTHORIZE: self.token_authorize,
+        }
+        f = fmaps.get(self.cpn)
+        if not f:
+            raise PopupError("Action not Exists")
+        async for result in f(request):
+            yield result
 
     async def login(self, request):
         manager = UserManager()

@@ -21,31 +21,25 @@ class ChitchatHandler(BaseHandler):
         api_common_pb.ProtocolNumber.DELETE_CHITCHAT,
         api_common_pb.ProtocolNumber.CREATE_MESSAGE,
         api_common_pb.ProtocolNumber.UPDATE_MESSAGE,
+        api_common_pb.ProtocolNumber.LIST_CHITCHAT,
         api_common_pb.ProtocolNumber.REGENERATE,
     ]
 
     async def __call__(self, request):
-        if self.cpn == api_common_pb.ProtocolNumber.CREATE_MESSAGE:
-            async for result in self.create_message(request):
-                yield result
-        elif self.cpn == api_common_pb.ProtocolNumber.UPDATE_MESSAGE:
-            async for result in self.update_message(request):
-                yield result
-        elif self.cpn == api_common_pb.ProtocolNumber.LIST_MESSAGE:
-            async for result in self.list_message(request):
-                yield result
-        elif self.cpn == api_common_pb.ProtocolNumber.CREATE_CHITCHAT:
-            async for result in self.create_chitchat(request):
-                yield result
-        elif self.cpn == api_common_pb.ProtocolNumber.UPDATE_CHITCHAT:
-            async for result in self.update_chitchat(request):
-                yield result
-        elif self.cpn == api_common_pb.ProtocolNumber.DELETE_CHITCHAT:
-            async for result in self.delete_chitchat(request):
-                yield result
-        elif self.cpn == api_common_pb.ProtocolNumber.LIST_CHITCHAT:
-            async for result in self.list_chitchat(request):
-                yield result
+        fmaps = {
+            api_common_pb.ProtocolNumber.CREATE_MESSAGE: self.create_message,
+            api_common_pb.ProtocolNumber.CREATE_CHITCHAT: self.create_chitchat,
+            api_common_pb.ProtocolNumber.UPDATE_CHITCHAT: self.update_chitchat,
+            api_common_pb.ProtocolNumber.UPDATE_MESSAGE: self.update_message,
+            api_common_pb.ProtocolNumber.DELETE_CHITCHAT: self.delete_chitchat,
+            api_common_pb.ProtocolNumber.LIST_CHITCHAT: self.list_chitchat,
+            api_common_pb.ProtocolNumber.REGENERATE: self.regenerate,
+        }
+        f = fmaps.get(self.cpn)
+        if not f:
+            raise PopupError("Action Not Exists")
+        async for result in f(request):
+            yield result
 
     async def delete_chitchat(self, request):
         manager = ChitchatManager()
