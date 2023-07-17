@@ -5,6 +5,7 @@ import asyncio
 import importlib.util
 from pathlib import Path
 
+import proto.api.api_common_pb2 as api_common_pb
 from submodules.utils.logger import Logger
 from submodules.utils.sys_env import SysEnv
 from handlers.base_handler import BaseHandler
@@ -59,7 +60,7 @@ class HandlerHelper:
                 if p in self.handlers:
                     continue
                 self.handlers.update({p: _handler})
-            logger.info(f"导入handler: {_handler} {self.handlers}")
+                logger.info(f"import handler: {api_common_pb.ProtocolNumber.Name(p)} ==> {_handler}")
 
 
 if __name__ == "__main__":
