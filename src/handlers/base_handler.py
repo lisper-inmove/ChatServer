@@ -8,3 +8,4 @@ class BaseHandler(Base):
         super().__init__(*args, **kargs)
         self.cpn = pn
         self.user = kargs.get('user')
+        self.websocket = kargs.get('websocket')

@@ -24,28 +24,42 @@ class Server:
     async def __handle_connection(self, websocket, path):
         async for message_json in websocket:
             try:
+
                 message = api_common_pb.Protocol()
                 message.ParseFromString(message_json)
                 logger.info(f"收到信息: {message} {websocket}")
+                if self.no_handler_message(websocket, message):
+                    continue
                 handler = self.handlers.get(message.action)(
                     message.action,
                     user=websocket.session.user
                 )
-                if message.action == api_common_pb.ProtocolNumber.PING:
-                    await self.handle_message(handler, websocket, message)
-                else:
-                    if websocket.session.isAuthorized:
-                        await self.handle_message(handler, websocket, message)
-                    elif message.action in [
-                            api_common_pb.ProtocolNumber.LOGIN,
-                            api_common_pb.ProtocolNumber.SIGN_UP,
-                            api_common_pb.ProtocolNumber.TOKEN_AUTHORIZE
+                if websocket.session.isAuthorized:
+                    if message.action in [
+                            api_common_pb.ProtocolNumber.STOP_GENERATE
                     ]:
-                        await self.handle_user_authorize(handler, websocket, message)
+                        await self.no_handler_message(websocket, message)
+                    else:
+                        await self.handle_message(handler, websocket, message)
+                elif message.action in [
+                        api_common_pb.ProtocolNumber.LOGIN,
+                        api_common_pb.ProtocolNumber.SIGN_UP,
+                        api_common_pb.ProtocolNumber.TOKEN_AUTHORIZE
+                ]:
+                    await self.handle_user_authorize(handler, websocket, message)
             except PopupError as err:
                 logger.traceback(err, f"业务逻辑错误: {err}")
                 replay = self.wrap_protocol(None, handler.cpn).SerializeToString()
                 await websocket.send(replay)
+
+    def no_handler_message(self, websocket, message):
+        """某些不需要handler的操作"""
+        if message.action == api_common_pb.ProtocolNumber.STOP_GENERATE:
+            logger.info(f"Set generate stop: {websocket}")
+            websocket.session.stop_generate = True
+        else:
+            return False
+        return True
 
     async def handle_message(self, handler, websocket, message):
         async for response in handler(message.content):

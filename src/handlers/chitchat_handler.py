@@ -21,6 +21,7 @@ class ChitchatHandler(BaseHandler):
         api_common_pb.ProtocolNumber.DELETE_CHITCHAT,
         api_common_pb.ProtocolNumber.CREATE_MESSAGE,
         api_common_pb.ProtocolNumber.UPDATE_MESSAGE,
+        api_common_pb.ProtocolNumber.REGENERATE,
     ]
 
     async def __call__(self, request):
@@ -74,6 +75,7 @@ class ChitchatHandler(BaseHandler):
         request = self.PH.to_obj_v2(request, api_chitchat_pb.CreateMessageRequest)
         chitchatMessage = manager.create_chitchat_message(request)
         chitchatResponseMessage = manager.create_chitchat_response_message(request)
+        self.websocket.session.stop_generate = False
         with grpc.secure_channel('chat.inmove.top:8443', grpc.ssl_channel_credentials()) as channel:
             stub = grpc_chatgpt_pb_grpc.ChatGPTStub(channel)
             for response in stub.ChatCompletion(grpc_chatgpt_pb.ChatCompletionRequest(
@@ -87,6 +89,8 @@ class ChitchatHandler(BaseHandler):
                 response = self.generate_response(response)
                 chitchatResponseMessage.content += response.content
                 yield response
+                if self.websocket.session.stop_generate:
+                    break
         await manager.add_or_update_chitchat_message(chitchatMessage)
         await manager.add_or_update_chitchat_message(chitchatResponseMessage)
 
