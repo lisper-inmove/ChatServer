@@ -32,7 +32,8 @@ class Server:
                     continue
                 handler = self.handlers.get(message.action)(
                     message.action,
-                    user=websocket.session.user
+                    user=websocket.session.user,
+                    websocket=websocket
                 )
                 if websocket.session.isAuthorized:
                     if message.action in [

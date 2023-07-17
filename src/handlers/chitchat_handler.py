@@ -1,8 +1,10 @@
-import proto.api.api_chitchat_pb2 as api_chitchat_pb
-import proto.api.api_common_pb2 as api_common_pb
 import time
 import random
 import json
+
+import proto.api.api_chitchat_pb2 as api_chitchat_pb
+import proto.api.api_common_pb2 as api_common_pb
+import proto.entities.chitchat_pb2 as chitchat_pb
 from handlers.base_handler import BaseHandler
 from manager.chitchat_manager import ChitchatManager
 from manager.chitchat_message_manager import ChitchatMessageManager
@@ -15,24 +17,26 @@ import proto.grpc_api.grpc_chatgpt_pb2_grpc as grpc_chatgpt_pb_grpc
 
 class ChitchatHandler(BaseHandler):
 
+    CHATGPT_CLIENT_HOST = "chat.inmove.top:8443"
+
     PN = [
         api_common_pb.ProtocolNumber.CREATE_CHITCHAT,
         api_common_pb.ProtocolNumber.UPDATE_CHITCHAT,
         api_common_pb.ProtocolNumber.DELETE_CHITCHAT,
+        api_common_pb.ProtocolNumber.LIST_CHITCHAT,
         api_common_pb.ProtocolNumber.CREATE_MESSAGE,
         api_common_pb.ProtocolNumber.UPDATE_MESSAGE,
-        api_common_pb.ProtocolNumber.LIST_CHITCHAT,
         api_common_pb.ProtocolNumber.REGENERATE,
     ]
 
     async def __call__(self, request):
         fmaps = {
-            api_common_pb.ProtocolNumber.CREATE_MESSAGE: self.create_message,
             api_common_pb.ProtocolNumber.CREATE_CHITCHAT: self.create_chitchat,
             api_common_pb.ProtocolNumber.UPDATE_CHITCHAT: self.update_chitchat,
-            api_common_pb.ProtocolNumber.UPDATE_MESSAGE: self.update_message,
             api_common_pb.ProtocolNumber.DELETE_CHITCHAT: self.delete_chitchat,
             api_common_pb.ProtocolNumber.LIST_CHITCHAT: self.list_chitchat,
+            api_common_pb.ProtocolNumber.CREATE_MESSAGE: self.create_message,
+            api_common_pb.ProtocolNumber.UPDATE_MESSAGE: self.update_message,
             api_common_pb.ProtocolNumber.REGENERATE: self.regenerate,
         }
         f = fmaps.get(self.cpn)
@@ -67,26 +71,40 @@ class ChitchatHandler(BaseHandler):
     async def create_message(self, request):
         manager = ChitchatMessageManager()
         request = self.PH.to_obj_v2(request, api_chitchat_pb.CreateMessageRequest)
-        chitchatMessage = manager.create_chitchat_message(request)
-        chitchatResponseMessage = manager.create_chitchat_response_message(request)
-        self.websocket.session.stop_generate = False
-        with grpc.secure_channel('chat.inmove.top:8443', grpc.ssl_channel_credentials()) as channel:
+        message = manager.create_chitchat_message(request)
+        responseMessage = manager.create_chitchat_response_message(message)
+        async for response in self.__call_chat_completion_request(message, responseMessage):
+            yield response
+        await manager.add_or_update_chitchat_message(message)
+        await manager.add_or_update_chitchat_message(responseMessage)
+
+    async def regenerate(self, request):
+        request = self.PH.to_obj_v2(request, api_chitchat_pb.Regeneraterequest)
+        manager = ChitchatMessageManager()
+        message = manager.get_chitchat_message_by_id(request.messageId)
+        responseMessage = manager.create_chitchat_response_message(message)
+        async for response in self.__call_chat_completion_request(message, responseMessage):
+            yield response
+        await manager.add_or_update_chitchat_message(message)
+        await manager.add_or_update_chitchat_message(responseMessage)
+
+    async def __call_chat_completion_request(self, message, responseMessage):
+        with grpc.secure_channel(self.CHATGPT_CLIENT_HOST, grpc.ssl_channel_credentials()) as channel:
             stub = grpc_chatgpt_pb_grpc.ChatGPTStub(channel)
             for response in stub.ChatCompletion(grpc_chatgpt_pb.ChatCompletionRequest(
-                    messages=[
-                        grpc_chatgpt_pb.ChatCompletionRequest.ChatCompletionMessage(
-                            role=request.role,
-                            content=request.content
-                        )
-                    ]
+                messages=[
+                    grpc_chatgpt_pb.ChatCompletionRequest.ChatCompletionMessage(
+                        role=chitchat_pb.ChitchatMessage.Role.Name(message.role).lower(),
+                        content=message.content
+                    )
+                ]
             )):
                 response = self.generate_response(response)
-                chitchatResponseMessage.content += response.content
+                responseMessage.content += response.content
                 yield response
                 if self.websocket.session.stop_generate:
+                    self.websocket.session.stop_generate = False
                     break
-        await manager.add_or_update_chitchat_message(chitchatMessage)
-        await manager.add_or_update_chitchat_message(chitchatResponseMessage)
 
     def generate_response(self, chunk):
         choice = chunk.choices[0]

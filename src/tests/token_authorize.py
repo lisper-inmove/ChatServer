@@ -15,4 +15,5 @@ async def send(client):
     await client.send(message.SerializeToString())
 
 
-asyncio.run(main(send))
+if __name__ == '__main__':
+    asyncio.run(main(send))

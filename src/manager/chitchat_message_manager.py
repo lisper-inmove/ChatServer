@@ -12,15 +12,15 @@ class ChitchatMessageManager(BaseManager):
         return self._dao
 
     def create_chitchat_message(self, request):
-        chitchat_message = self.create_obj(chitchat_pb.ChitchatMessage)
-        chitchat_message.chitchatId = request.chitchatId
-        chitchat_message.content = request.content
-        return chitchat_message
+        message = self.create_obj(chitchat_pb.ChitchatMessage)
+        message.chitchatId = request.chitchatId
+        message.content = request.content
+        message.role = chitchat_pb.ChitchatMessage.Role.Value(request.role)
+        return message
 
-    def create_chitchat_response_message(self, request):
+    def create_chitchat_response_message(self, message):
         chitchat_message = self.create_obj(chitchat_pb.ChitchatMessage)
-        chitchat_message.chitchatId = request.chitchatId
-        chitchat_message.isResponse = True
+        chitchat_message.previousId = message.id
         return chitchat_message
 
     async def get_chitchat_message_by_id(self, id):
