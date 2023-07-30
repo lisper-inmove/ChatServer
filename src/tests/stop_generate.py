@@ -10,8 +10,8 @@ from tester import main
 
 async def send(client):
     _request = api_chitchat_pb.StopGenerateRequest()
-    message = api_common_pb.Protocol()
-    message.action = api_common_pb.ProtocolNumber.STOP_GENERATE
+    message = api_common_pb.Action()
+    message.name = api_common_pb.Action.STOP_GENERATE
     message.content = ProtobufHelper.to_json_v2(_request)
     await client.send(message.SerializeToString())
 

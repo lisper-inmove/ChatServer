@@ -60,7 +60,7 @@ class HandlerHelper:
                 if p in self.handlers:
                     continue
                 self.handlers.update({p: _handler})
-                logger.info(f"import handler: {api_common_pb.ProtocolNumber.Name(p)} ==> {_handler}")
+                logger.info(f"import handler: {api_common_pb.Action.Name(p)} ==> {_handler}")
 
 
 if __name__ == "__main__":

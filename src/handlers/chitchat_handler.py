@@ -20,24 +20,24 @@ class ChitchatHandler(BaseHandler):
     CHATGPT_CLIENT_HOST = "chat.inmove.top:8443"
 
     PN = [
-        api_common_pb.ProtocolNumber.CREATE_CHITCHAT,
-        api_common_pb.ProtocolNumber.UPDATE_CHITCHAT,
-        api_common_pb.ProtocolNumber.DELETE_CHITCHAT,
-        api_common_pb.ProtocolNumber.LIST_CHITCHAT,
-        api_common_pb.ProtocolNumber.CREATE_MESSAGE,
-        api_common_pb.ProtocolNumber.UPDATE_MESSAGE,
-        api_common_pb.ProtocolNumber.REGENERATE,
+        api_common_pb.Action.CREATE_CHITCHAT,
+        api_common_pb.Action.UPDATE_CHITCHAT,
+        api_common_pb.Action.DELETE_CHITCHAT,
+        api_common_pb.Action.LIST_CHITCHAT,
+        api_common_pb.Action.CREATE_MESSAGE,
+        api_common_pb.Action.UPDATE_MESSAGE,
+        api_common_pb.Action.REGENERATE,
     ]
 
     async def __call__(self, request):
         fmaps = {
-            api_common_pb.ProtocolNumber.CREATE_CHITCHAT: self.create_chitchat,
-            api_common_pb.ProtocolNumber.UPDATE_CHITCHAT: self.update_chitchat,
-            api_common_pb.ProtocolNumber.DELETE_CHITCHAT: self.delete_chitchat,
-            api_common_pb.ProtocolNumber.LIST_CHITCHAT: self.list_chitchat,
-            api_common_pb.ProtocolNumber.CREATE_MESSAGE: self.create_message,
-            api_common_pb.ProtocolNumber.UPDATE_MESSAGE: self.update_message,
-            api_common_pb.ProtocolNumber.REGENERATE: self.regenerate,
+            api_common_pb.Action.CREATE_CHITCHAT: self.create_chitchat,
+            api_common_pb.Action.UPDATE_CHITCHAT: self.update_chitchat,
+            api_common_pb.Action.DELETE_CHITCHAT: self.delete_chitchat,
+            api_common_pb.Action.LIST_CHITCHAT: self.list_chitchat,
+            api_common_pb.Action.CREATE_MESSAGE: self.create_message,
+            api_common_pb.Action.UPDATE_MESSAGE: self.update_message,
+            api_common_pb.Action.REGENERATE: self.regenerate,
         }
         f = fmaps.get(self.cpn)
         if not f:
@@ -79,7 +79,7 @@ class ChitchatHandler(BaseHandler):
         await manager.add_or_update_chitchat_message(responseMessage)
 
     async def regenerate(self, request):
-        request = self.PH.to_obj_v2(request, api_chitchat_pb.Regeneraterequest)
+        request = self.PH.to_obj_v2(request, api_chitchat_pb.RegenerateRequest)
         manager = ChitchatMessageManager()
         message = manager.get_chitchat_message_by_id(request.messageId)
         responseMessage = manager.create_chitchat_response_message(message)

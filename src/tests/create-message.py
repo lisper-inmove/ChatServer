@@ -12,8 +12,8 @@ async def send(client):
     _request = api_chitchat_pb.CreateMessageRequest()
     _request.role = "USER"
     _request.content = "Hello Can you create a hello world program using Rust"
-    protocol = api_common_pb.Protocol()
-    protocol.action = api_common_pb.ProtocolNumber.CREATE_MESSAGE
+    protocol = api_common_pb.Action()
+    protocol.action = api_common_pb.Action.CREATE_MESSAGE
     protocol.content = ProtobufHelper.to_json_v2(_request)
     await client.send(protocol.SerializeToString())
 

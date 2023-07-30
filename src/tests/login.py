@@ -11,8 +11,8 @@ async def send(client):
     _request = api_user_pb.UserLoginRequest()
     _request.username = "inmove"
     _request.password = hashlib.md5("Allen123453#".encode()).hexdigest()
-    message = api_common_pb.Protocol()
-    message.action = api_common_pb.ProtocolNumber.LOGIN
+    message = api_common_pb.Action()
+    message.name = api_common_pb.Action.LOGIN
     message.content = ProtobufHelper.to_json_v2(_request)
     await client.send(message.SerializeToString())
 

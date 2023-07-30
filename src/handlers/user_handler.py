@@ -5,6 +5,7 @@ import proto.api.api_common_pb2 as api_common_pb
 from handlers.base_handler import BaseHandler
 from manager.user_manager import UserManager
 from errors import PopupError
+from errors import PopupSpecError
 from submodules.utils.jwt_util import JWTUtil
 from submodules.utils.jwt_util import TokenExpiredException
 
@@ -12,16 +13,16 @@ from submodules.utils.jwt_util import TokenExpiredException
 class UserHandler(BaseHandler):
 
     PN = [
-        api_common_pb.ProtocolNumber.LOGIN,
-        api_common_pb.ProtocolNumber.SIGN_UP,
-        api_common_pb.ProtocolNumber.TOKEN_AUTHORIZE
+        api_common_pb.Action.LOGIN,
+        api_common_pb.Action.SIGN_UP,
+        api_common_pb.Action.TOKEN_AUTHORIZE
     ]
 
     async def __call__(self, request):
         fmaps = {
-            api_common_pb.ProtocolNumber.LOGIN: self.login,
-            api_common_pb.ProtocolNumber.SIGN_UP: self.sign_up,
-            api_common_pb.ProtocolNumber.TOKEN_AUTHORIZE: self.token_authorize,
+            api_common_pb.Action.LOGIN: self.login,
+            api_common_pb.Action.SIGN_UP: self.sign_up,
+            api_common_pb.Action.TOKEN_AUTHORIZE: self.token_authorize,
         }
         f = fmaps.get(self.cpn)
         if not f:
@@ -65,7 +66,7 @@ class UserHandler(BaseHandler):
             self.user = user
             yield self.generate_response(user)
         except TokenExpiredException as ex:
-            raise PopupError("认证已过期,请重新登陆")
+            raise PopupSpecError(api_common_pb.TOKEN_AUTHORIZE_EXPIRED, "认证已过期,请重新登陆")
 
     def generate_response(self, user):
         response = api_user_pb.UserCommonResponse()

@@ -2,8 +2,8 @@ dev:
 	export PYTHONPATH=`pwd`/src:`pwd`/src/proto/grpc_api && source bin/util.sh && python src/app.py
 install-lib:
 	pip install -r requirement.txt
-test-chat:
-	export PYTHONPATH=`pwd`/src:`pwd`/src/proto/grpc_api && source bin/util.sh && python src/tests/chat.py
+test-create-message:
+	export PYTHONPATH=`pwd`/src:`pwd`/src/proto/grpc_api && source bin/util.sh && python src/tests/create-message.py
 test-login:
 	export PYTHONPATH=`pwd`/src:`pwd`/src/proto/grpc_api && source bin/util.sh && python src/tests/login.py
 test-sign-up:
